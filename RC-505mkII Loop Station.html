@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RC-505">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#050505">
+
+<!-- PWA manifest -->
+<link rel="manifest" href="manifest.webmanifest">
+
+<!-- iOS app icons + splash -->
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+
+<title>RC-505mkII Loop Station</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Geist+Mono:wght@400;500;600&amp;family=VT323&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="rc505.css">
+</head>
+<body>
+
+<!-- Tap-to-start overlay (required for iOS audio context) -->
+<div class="boot-overlay" id="boot-overlay">
+  <div class="boot-card">
+    <div class="boot-logo">
+      <div class="boot-mark">▼</div>
+      <div class="boot-text">RC-505mkII</div>
+    </div>
+    <div class="boot-sub">LOOP STATION · WEB SIMULATOR</div>
+    <button class="boot-btn" id="boot-start">탭해서 시작 / Tap to start</button>
+    <div class="boot-hint">마이크 권한을 허용하면 실제 루핑이 가능해요</div>
+  </div>
+</div>
+
+<!-- Portrait orientation hint (iPad portrait) -->
+<div class="rotate-hint" id="rotate-hint">
+  <div class="rotate-icon">⟳</div>
+  <div class="rotate-text">가로 모드로 사용해주세요<br><span>Please rotate to landscape</span></div>
+</div>
+
+<div class="page-bg">
+  <div class="page-header">
+    <div class="page-title">
+      <span class="dot"></span>
+      <span>BOSS · RC-505mkII LOOP STATION</span>
+      <span class="page-sub">Web simulator · click the big track buttons to record → play → overdub</span>
+    </div>
+    <div class="page-actions">
+      <button id="hint-btn" class="page-btn">Shortcuts</button>
+      <button id="reset-btn" class="page-btn danger">Reset all</button>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="device" id="device">
+
+      <!-- ============ Top connector strip ============ -->
+      <div class="connector-strip">
+        <div class="conn-group">
+          <span class="conn-label">MIC 1</span>
+          <span class="conn-jack"></span>
+          <span class="conn-label">MIC 2</span>
+          <span class="conn-jack"></span>
+          <span class="conn-bracket left">INPUT</span>
+          <span class="conn-label">L</span>
+          <span class="conn-jack"></span>
+          <span class="conn-label">INST 1</span>
+          <span class="conn-jack"></span>
+          <span class="conn-label">R</span>
+          <span class="conn-label">L</span>
+          <span class="conn-jack"></span>
+          <span class="conn-label">INST 2</span>
+          <span class="conn-jack"></span>
+          <span class="conn-label">R</span>
+        </div>
+        <div class="conn-group">
+          <span class="conn-label">MAIN</span>
+          <span class="conn-jack"></span>
+          <span class="conn-label">SUB 1</span>
+          <span class="conn-jack"></span>
+          <span class="conn-label">SUB 2</span>
+          <span class="conn-jack"></span>
+          <span class="conn-label">PHONES</span>
+          <span class="conn-jack"></span>
+          <span class="conn-bracket up">OUTPUT</span>
+          <span class="conn-label">CTL/EXP</span>
+          <span class="conn-jack small"></span>
+        </div>
+        <div class="conn-group">
+          <span class="conn-label">IN</span>
+          <span class="conn-jack small"></span>
+          <span class="conn-label">OUT</span>
+          <span class="conn-jack small"></span>
+          <span class="conn-bracket up">MIDI</span>
+          <span class="conn-label">USB</span>
+          <span class="conn-jack small square"></span>
+          <span class="conn-label">POWER</span>
+          <span class="conn-jack tiny"></span>
+          <span class="conn-label">DC IN</span>
+          <span class="conn-jack small round"></span>
+        </div>
+      </div>
+
+      <!-- ============ Brand bar ============ -->
+      <div class="brand-bar">
+        <div class="brand-left">
+          <div class="boss-logo">
+            <div class="boss-mark">▼</div>
+            <div class="boss-text">BOSS</div>
+          </div>
+        </div>
+        <div class="brand-center">
+          <div class="brand-rule"></div>
+          <div class="brand-title">RC-505<span class="mkii">mkII</span> LOOP STATION</div>
+          <div class="brand-rule"></div>
+        </div>
+      </div>
+
+      <!-- ============ Top panel (knobs + display) ============ -->
+      <div class="top-panel">
+
+        <!-- LEFT: INPUT FX big knob -->
+        <div class="big-knob-block left">
+          <div class="big-knob" id="input-fx-knob">
+            <div class="big-knob-cap">
+              <div class="big-knob-indicator"></div>
+            </div>
+          </div>
+          <button class="edit-pill" data-fn="input-edit">
+            <div class="edit-pill-top">EDIT</div>
+            <div class="edit-pill-bot">(FX BANK: HOLD)</div>
+          </button>
+          <div class="section-label red">INPUT FX</div>
+        </div>
+
+        <!-- CENTER LEFT: MENU/LOOP + LCD -->
+        <div class="menu-loop-col">
+          <button class="oval-btn small" data-fn="menu">
+            <span class="ob-cap">MENU</span>
+            <span class="ob-led"></span>
+          </button>
+          <button class="oval-btn small" data-fn="loop">
+            <span class="ob-cap">LOOP</span>
+            <span class="ob-led"></span>
+          </button>
+        </div>
+
+        <!-- LCD DISPLAY -->
+        <div class="lcd-wrap">
+          <div class="lcd-bezel">
+            <div class="lcd-screen" id="lcd">
+              <div class="lcd-row top">
+                <span class="lcd-tempo">♩=<span id="lcd-bpm">120.0</span></span>
+              </div>
+              <div class="lcd-row big">
+                <div class="lcd-mem-num" id="lcd-mem-num">01</div>
+                <div class="lcd-mem-name" id="lcd-mem-name">Memory01</div>
+              </div>
+              <div class="lcd-row bottom">
+                <span class="lcd-tag" id="tag-memory">MEMORY</span>
+                <span class="lcd-tag stack">
+                  <span id="tag-mfx">MFX</span>
+                  <span id="tag-reverb">REVERB</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER RIGHT: EXIT/ENTER + arrows -->
+        <div class="exit-enter-col">
+          <div class="ee-row">
+            <button class="oval-btn small" data-fn="exit"><span class="ob-cap">EXIT</span><span class="ob-led"></span></button>
+            <button class="oval-btn small" data-fn="enter"><span class="ob-cap">ENTER</span><span class="ob-led"></span></button>
+          </div>
+          <div class="write-bracket">WRITE</div>
+          <div class="ee-row arrows">
+            <button class="oval-btn small arrow" data-fn="left"><span class="ob-cap">◀</span><span class="ob-led"></span></button>
+            <button class="oval-btn small arrow" data-fn="right"><span class="ob-cap">▶</span><span class="ob-led"></span></button>
+          </div>
+        </div>
+
+        <!-- OUTPUT LEVEL + RHYTHM -->
+        <div class="output-rhythm-col">
+          <div class="mini-knob" id="output-knob">
+            <div class="mini-knob-cap">
+              <div class="mini-knob-indicator"></div>
+            </div>
+          </div>
+          <div class="mini-knob-label">OUTPUT<br>LEVEL</div>
+          <div class="rhythm-marks">
+            <span class="rhy-dot"></span>
+            <span class="rhy-dot"></span>
+            <span class="rhy-dot"></span>
+          </div>
+          <button class="edit-pill tiny" data-fn="rhythm-edit">
+            <div class="edit-pill-top">EDIT</div>
+          </button>
+          <div class="rhythm-arrows">
+            <div class="rhy-arrow">▲</div>
+            <div class="rhy-arrow-label">RHYTHM</div>
+            <div class="rhy-arrow">▼</div>
+          </div>
+        </div>
+
+        <!-- RIGHT: TRACK FX big knob -->
+        <div class="big-knob-block right">
+          <button class="edit-pill" data-fn="track-edit">
+            <div class="edit-pill-top">EDIT</div>
+            <div class="edit-pill-bot">(FX BANK: HOLD)</div>
+          </button>
+          <div class="big-knob" id="track-fx-knob">
+            <div class="big-knob-cap">
+              <div class="big-knob-indicator"></div>
+            </div>
+          </div>
+          <div class="section-label red">TRACK FX</div>
+        </div>
+      </div>
+
+      <!-- ============ Mid button row ============ -->
+      <div class="mid-row">
+
+        <!-- INPUT FX A/B/C/D -->
+        <div class="abcd-bank input-fx-bank" data-bank="input">
+          <button class="bank-btn" data-color="red" data-letter="A"><span class="bb-letter">A</span></button>
+          <button class="bank-btn" data-color="orange" data-letter="B"><span class="bb-letter">B</span></button>
+          <button class="bank-btn" data-color="green" data-letter="C"><span class="bb-letter">C</span></button>
+          <button class="bank-btn" data-color="pink" data-letter="D"><span class="bb-letter">D</span></button>
+        </div>
+
+        <button class="oval-btn green big-text" data-fn="all-start-stop">
+          <span class="ob-cap">ALL<br>START/STOP</span>
+          <span class="ob-led green"></span>
+        </button>
+
+        <button class="oval-btn" data-fn="undo-redo">
+          <span class="ob-cap">UNDO/<br>REDO</span>
+          <span class="ob-led"></span>
+        </button>
+
+        <!-- 4 small param knobs -->
+        <div class="param-knobs">
+          <div class="param-knob" data-idx="0"><div class="pk-cap"><div class="pk-ind"></div></div></div>
+          <div class="param-knob" data-idx="1"><div class="pk-cap"><div class="pk-ind"></div></div></div>
+          <div class="param-knob" data-idx="2"><div class="pk-cap"><div class="pk-ind"></div></div></div>
+          <div class="param-knob" data-idx="3"><div class="pk-cap"><div class="pk-ind"></div></div></div>
+        </div>
+
+        <button class="oval-btn green big-text" data-fn="tap-tempo">
+          <span class="ob-cap">TAP<br>TEMPO</span>
+          <span class="ob-led green"></span>
+        </button>
+
+        <button class="oval-btn" data-fn="rhythm-start-stop">
+          <span class="ob-cap">START/<br>STOP</span>
+          <span class="ob-led"></span>
+        </button>
+
+        <!-- TRACK FX A/B/C/D -->
+        <div class="abcd-bank track-fx-bank" data-bank="track">
+          <button class="bank-btn" data-color="red" data-letter="A"><span class="bb-letter">A</span></button>
+          <button class="bank-btn" data-color="orange" data-letter="B"><span class="bb-letter">B</span></button>
+          <button class="bank-btn" data-color="green" data-letter="C"><span class="bb-letter">C</span></button>
+          <button class="bank-btn" data-color="pink" data-letter="D"><span class="bb-letter">D</span></button>
+        </div>
+      </div>
+
+      <!-- ============ Silver chrome divider ============ -->
+      <div class="chrome-divider">
+        <div class="chrome-inner"></div>
+      </div>
+
+      <!-- ============ 5 Track strips ============ -->
+      <div class="tracks-row" id="tracks-row">
+        <!-- generated by JS -->
+      </div>
+
+    </div>
+  </div>
+
+  <div class="page-foot">
+    <span>Big button: <kbd>REC</kbd> → <kbd>PLAY</kbd> → <kbd>OVERDUB</kbd> · Hold/right-click = <kbd>STOP</kbd> · Hold ■ = CLEAR · Knobs: scroll wheel, drag in circle, vertical drag (Shift = fine) · Double-click knob to reset.</span>
+  </div>
+</div>
+
+<div class="shortcuts-modal" id="shortcuts-modal" aria-hidden="true">
+  <div class="sm-card">
+    <div class="sm-head">
+      <div class="sm-title">Keyboard shortcuts</div>
+      <button id="sm-close" class="page-btn">Close</button>
+    </div>
+    <div class="sm-grid">
+      <div class="sm-row"><kbd>1</kbd>–<kbd>5</kbd><span>Trigger track 1–5</span></div>
+      <div class="sm-row"><kbd>Q</kbd> <kbd>W</kbd> <kbd>E</kbd> <kbd>R</kbd> <kbd>T</kbd><span>Stop track 1–5</span></div>
+      <div class="sm-row"><kbd>Space</kbd><span>ALL START / STOP</span></div>
+      <div class="sm-row"><kbd>Z</kbd><span>UNDO/REDO</span></div>
+      <div class="sm-row"><kbd>X</kbd><span>TAP TEMPO</span></div>
+      <div class="sm-row"><kbd>C</kbd><span>RHYTHM START/STOP</span></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/tone@14.8.49/build/Tone.js"></script>
+<script src="rc505.js"></script>
+</body>
+</html>
